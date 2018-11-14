@@ -1,4 +1,4 @@
 public interface Cloth {
-    void putOn();
-    void takeOff();
+    void putOn(Human human);
+    void takeOff(Human human);
 }

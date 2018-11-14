@@ -1,45 +1,83 @@
+import javafx.scene.canvas.GraphicsContext;
+
 import java.util.ArrayList;
 
-public class Human implements Creature {
+public class Human extends Creature {
 	
 	private String name;
 	private int age;
 	private long tall;
 	private ArrayList<Cloth> cloths;
+	private int charism;
+	private float headDiametr;
 
-	public Human(String name, int age, long tall, ArrayList<Cloth> cloths) {
+	public Human(String name, int age, long tall, ArrayList<Cloth> cloths, int charism, Fear fear, float headDiametr, int x, int y, int speed) {
+		super(name, x, y, speed, fear);
 		this.name = name;
 		this.age = age;
 		this.tall = tall;
 		this.cloths = cloths;
+		this.charism = charism;
+		this.headDiametr = headDiametr;
 	}
 
-	public Human(String name, int age, long tall) {
+	public Human(String name, int age, long tall, int charism, Fear fear, float headDiametr, int x, int y, int speed) {
+		super(name, x, y, speed, fear);
 		this.name = name;
 		this.age = age;
 		this.tall = tall;
 		this.cloths = null;
-	}
-	
-
-	@Override
-	public void move() {
-		System.out.println(this.name + " прячет голову и попискивает от страха. СТРАШНА ВЫРУБАЙ! ");
+		this.charism = charism;
+		this.headDiametr = headDiametr;
 	}
 
-	@Override
-	public void sound() {
-		System.out.println(this.name + " издает непонятные звуки, ведь " + this.name + " " + this.age + " лет. Особенно плохо, что " + this.name + " имеет рост " + this.tall + " сантиметров.");
-	}
 
-	public void beHuman() {
-		System.out.println("Толерантное общество, уважаем все меньшинства.");
+
+
+	public void beHuman(World world, Hedgehog hedgehog) {
+        if ((Math.abs(super.getX() - hedgehog.getX()) <= 1) && (Math.abs(super.getY() - hedgehog.getY()) <= 1)) {
+            int ordinal = hedgehog.getFear().ordinal();
+            long method = Math.round(Math.random() * 6 - 3);
+			System.out.println("Из-за метода успокаивания страх изменился на " + method);
+            if (ordinal > method) {
+                ordinal -= method;
+            } else {
+                ordinal = 0;
+            }
+
+
+            if (world.getWeather().ordinal() > 3) {
+                ordinal += world.getWeather().ordinal();
+				System.out.println("Из-за погоды страх изменился на -" + world.getWeather().ordinal());
+            } else {
+                ordinal -= world.getWeather().ordinal();
+				System.out.println("Из-за погоды страх изменился на " + world.getWeather().ordinal());
+            }
+
+			System.out.println("Из-за харизмы страх изменился на " + charism);
+            if (ordinal > charism) {
+                ordinal -= charism;
+            } else {
+                ordinal = 0;
+            }
+
+            if (ordinal < 0) {
+                ordinal = 0;
+            } else if (ordinal > 5) {
+                ordinal = 5;
+            }
+
+            hedgehog.setFear(Fear.values()[ordinal]);
+        } else {
+            System.out.println("Этот ёжик слишком далеко...");
+        }
+
 	}
 
 	public void putOnCloth() {
 		if (cloths != null) {
 			for (Cloth cloth : cloths) {
-				cloth.putOn();
+				cloth.putOn(this);
 			}
 		}
 	}
@@ -47,7 +85,7 @@ public class Human implements Creature {
 	public void takeOffCloth() {
 		if (cloths != null) {
 			for (Cloth cloth : cloths) {
-				cloth.takeOff();
+				cloth.takeOff(this);
 			}
 		}
 	}
@@ -84,6 +122,23 @@ public class Human implements Creature {
 		this.cloths = cloths;
 	}
 
+	public int getCharism() {
+		return charism;
+	}
+
+	public void setCharism(int charism) {
+		this.charism = charism;
+	}
+
+	public float getHeadDiametr() {
+		return headDiametr;
+	}
+
+	public void setHeadDiametr(float headDiametr) {
+		this.headDiametr = headDiametr;
+	}
+
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -93,26 +148,33 @@ public class Human implements Creature {
 
 		if (age != human.age) return false;
 		if (tall != human.tall) return false;
+		if (charism != human.charism) return false;
+		if (Float.compare(human.headDiametr, headDiametr) != 0) return false;
 		if (!name.equals(human.name)) return false;
-		return cloths != null ? cloths.equals(human.cloths) : human.cloths == null;
+		if (cloths != null ? !cloths.equals(human.cloths) : human.cloths != null) return false;
+		return true;
 	}
 
 	@Override
 	public int hashCode() {
 		int result = name.hashCode();
 		result = 31 * result + age;
-		result = 31 * result + (int) tall;
+		result = 31 * result + (int) (tall);
 		result = 31 * result + (cloths != null ? cloths.hashCode() : 0);
+		result = 31 * result + charism;
+		result = 31 * result + (Math.round(headDiametr));
 		return result;
 	}
 
 	@Override
 	public String toString() {
-
-		return "Человек {" +
-				"имя=" + name +
-				", возраст=" + age +
-				", рост=" + tall +
+		return "Human{" +
+				"name='" + name + '\'' +
+				", age=" + age +
+				", tall=" + tall +
+				", cloths=" + cloths.toString() +
+				", charism=" + charism +
+				", headDiametr=" + headDiametr +
 				'}';
 	}
 }

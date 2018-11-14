@@ -1,5 +1,10 @@
 public enum Weather {
     SUN,
+    WARM,
+    COLD,
+    CLOUDS,
     RAIN,
-    STORM;
+    STORM,
+    HURRICANE,
+    APOCALYPSIS;
 }

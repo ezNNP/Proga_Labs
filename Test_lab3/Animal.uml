@@ -3,46 +3,44 @@
   <ID>JAVA</ID>
   <OriginalElement>Animal</OriginalElement>
   <nodes>
-    <node x="246.0" y="129.0">Human</node>
-    <node x="0.0" y="914.0">Weather</node>
-    <node x="0.0" y="548.0">Hedgehog</node>
-    <node x="200.5" y="0.0">Creature</node>
-    <node x="34.0" y="250.0">Animal</node>
-    <node x="682.5" y="0.0">Cloth</node>
-    <node x="651.0" y="129.0">Hat</node>
-    <node x="925.0" y="0.0">World</node>
+    <node x="130.0" y="82.0">Human</node>
+    <node x="0.0" y="241.0">Weather</node>
+    <node x="0.0" y="164.0">Hedgehog</node>
+    <node x="65.5" y="0.0">Creature</node>
+    <node x="12.0" y="82.0">Animal</node>
+    <node x="275.0" y="0.0">Cloth</node>
+    <node x="281.0" y="82.0">Hat</node>
+    <node x="154.0" y="241.0">World</node>
+    <node x="0.0" y="318.0">Main</node>
   </nodes>
   <notes />
   <edges>
+    <edge source="Hat" target="Cloth">
+      <point x="0.0" y="-16.0" />
+      <point x="0.0" y="16.0" />
+    </edge>
     <edge source="Hedgehog" target="Animal">
-      <point x="0.0" y="-160.5" />
-      <point x="0.0" y="63.5" />
+      <point x="0.0" y="-16.0" />
+      <point x="0.0" y="16.0" />
     </edge>
     <edge source="Animal" target="Creature">
-      <point x="0.0" y="-63.5" />
-      <point x="130.0" y="104.0" />
-      <point x="239.25" y="104.0" />
-      <point x="-38.75" y="39.5" />
-    </edge>
-    <edge source="Hat" target="Cloth">
-      <point x="0.0" y="-100.5" />
-      <point x="0.0" y="39.5" />
+      <point x="0.0" y="-16.0" />
+      <point x="61.0" y="57.0" />
+      <point x="93.0" y="57.0" />
+      <point x="-27.5" y="16.0" />
     </edge>
     <edge source="Human" target="Creature">
-      <point x="0.0" y="-184.5" />
-      <point x="426.0" y="104.0" />
-      <point x="316.75" y="104.0" />
-      <point x="38.75" y="39.5" />
+      <point x="0.0" y="-16.0" />
+      <point x="180.0" y="57.0" />
+      <point x="148.0" y="57.0" />
+      <point x="27.5" y="16.0" />
     </edge>
   </edges>
-  <settings layout="Hierarchic Group" zoom="1.0" x="446.5" y="358.0" />
-  <SelectedNodes />
-  <Categories>
-    <Category>Fields</Category>
-    <Category>Constructors</Category>
-    <Category>Methods</Category>
-    <Category>Properties</Category>
-  </Categories>
+  <settings layout="Hierarchic Group" zoom="1.0" x="181.0" y="175.0" />
+  <SelectedNodes>
+    <node>Creature</node>
+  </SelectedNodes>
+  <Categories />
   <SCOPE>All</SCOPE>
   <VISIBILITY>private</VISIBILITY>
 </Diagram>

@@ -1,23 +1,31 @@
 public class Hat implements Cloth {
 
     private boolean isOn;
+    private float diametr;
+    private int height;
+    private HatType hatType;
 
-    public Hat(boolean isOn) {
+    public Hat(boolean isOn, float diametr, int height, HatType hatType) {
         this.isOn = isOn;
+        this.diametr = diametr;
+        this.height = height;
+        this.hatType = hatType;
     }
 
     @Override
-    public void putOn() {
-        if (!isOn) {
-            System.out.println("Шляпа надета");
-            isOn = true;
-        } else {
+    public void putOn(Human human) {
+        if (isOn) {
             System.out.println("Шляпа уже надета, не стоит одевать вторую");
+        } else if ((this.diametr - human.getHeadDiametr() < 2.0) && (this.diametr - human.getHeadDiametr() > 0.5)) {
+            System.out.println("Мы надели шляпу на " + human.getName());
+            isOn = true;
+        } else if ((this.diametr - human.getHeadDiametr() >= 2.0) && (this.diametr - human.getHeadDiametr() <= 0.5)) {
+            System.out.println("Шляпа слишком мала для " + human.getName());
         }
     }
 
     @Override
-    public void takeOff() {
+    public void takeOff(Human human) {
         if (isOn) {
             System.out.println("Шляпа снята");
             isOn = false;
@@ -34,9 +42,28 @@ public class Hat implements Cloth {
         isOn = on;
     }
 
-    @Override
-    public int hashCode() {
-        return 31;
+    public float getDiametr() {
+        return diametr;
+    }
+
+    public void setDiametr(float diametr) {
+        this.diametr = diametr;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public HatType getHatType() {
+        return hatType;
+    }
+
+    public void setHatType(HatType hatType) {
+        this.hatType = hatType;
     }
 
     @Override
@@ -46,13 +73,28 @@ public class Hat implements Cloth {
 
         Hat hat = (Hat) o;
 
-        return isOn == hat.isOn;
+        if (isOn != hat.isOn) return false;
+        if (Float.compare(hat.diametr, diametr) != 0) return false;
+        if (height != hat.height) return false;
+        return hatType == hat.hatType;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (isOn ? 1 : 0);
+        result = 31 * result + Math.round(diametr);
+        result = 31 * result + height;
+        result = 31 * result + (hatType != null ? hatType.hashCode() : 0);
+        return result;
     }
 
     @Override
     public String toString() {
         return "Hat{" +
                 "isOn=" + isOn +
+                ", diametr=" + diametr +
+                ", height=" + height +
+                ", hatType=" + hatType +
                 '}';
     }
 }

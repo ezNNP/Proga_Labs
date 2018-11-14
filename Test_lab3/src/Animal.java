@@ -1,13 +1,17 @@
-public abstract class Animal implements Creature {
+import javafx.scene.canvas.GraphicsContext;
+
+public abstract class Animal extends Creature {
+
+    public Animal(String name, int x, int y, int speed, Fear fear) {
+        super(name, x, y, speed, fear);
+    }
+
+    public abstract void move(World world, int x, int y);
 
     @Override
-    public abstract void move();
-
-    @Override
-    public abstract void sound();
-
-    public abstract void goTo(int x, int y);
+    public void update(String shortName, int cellSize) {
+        super.update(shortName, cellSize);
+    }
 
     public abstract void sniff();
-
 }
