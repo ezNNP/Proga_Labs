@@ -3,7 +3,7 @@ import java.util.Arrays;
 
 public class World {
 
-	Creature[][] coordinates;
+	private Creature[][] coordinates;
 	private ArrayList<Creature> creatures;
 	private Weather weather;
 
@@ -64,6 +64,14 @@ public class World {
 
     public void setCoordinates(Creature[][] coordinates) {
         this.coordinates = coordinates;
+    }
+
+    public int getWidth() {
+	    return coordinates.length;
+    }
+
+    public int getHeight() {
+	    return coordinates[0].length;
     }
 
     @Override

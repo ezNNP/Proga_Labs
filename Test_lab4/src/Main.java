@@ -26,7 +26,7 @@ import java.util.ArrayList;
 public class Main extends Application {
 
     // TODO: 16.11.18 Cell size and width and height of world with variables
-    // TODO: 16.11.18 Переделать в id при наведении писать имя
+    // TODO: 16.11.18 Переделать в id при наведении писать имя | @done 24.11.2018-14:00
 
     private int windowWidth;
     private int windowHeight;
@@ -71,7 +71,7 @@ public class Main extends Application {
 
         Troll troll = new Troll("Мумми Тролль", 0, 1, 3, Fear.USUAL, 2);
 
-        Hedgehog hedgehog = new Hedgehog("Eжик", 3, 15, 10, 4, Fear.SHOCK, 0, 2, 3);
+        Hedgehog hedgehog = new Hedgehog("Yojik", 3, 15, 10, 4, Fear.SHOCK, 0, 2, 3); // транслитом потому-что с русскими буквами не работает roflan
 
         Human human1 = new Human("Ж", 1, 1, 5, Fear.CALM, 50F, 6, 6, 10);
         Human human2 = new Human("О", 1, 1, 1, Fear.CALM, 30F, 7, 7, 8);
@@ -84,20 +84,15 @@ public class Main extends Application {
             mainGridPain.getRowConstraints().add(row);
         }
 
-
         for (int i = 0; i < world.getCoordinates().length; i++) {
             ColumnConstraints column = new ColumnConstraints(cellSize);
             mainGridPain.getColumnConstraints().add(column);
         }
 
-        // Создаем JavaFX окно, добавляем сцену и канвас, на котором все будем рисовать
         root = new Group();
         scene = new Scene(root, world.getCoordinates().length * cellSize, world.getCoordinates()[0].length * cellSize, Paint.valueOf("#FFFFFF"));
         canvas = new Canvas(world.getCoordinates().length * cellSize, world.getCoordinates()[0].length * cellSize);
 
-        // Добавляем Graphic Context, рисуем координаты, добавляем сцену, добалвяем канвас, добавляем обработчик нажатия мыши
-        gc = canvas.getGraphicsContext2D();
-        drawCoords(gc, world.getCoordinates().length, world.getCoordinates()[0].length);
         primaryStage.setScene(scene);
         mainGridPain.setVisible(true);
         mainGridPain.setGridLinesVisible(true);
@@ -119,74 +114,36 @@ public class Main extends Application {
             }
         });
 
-        // Настройки окна JavaFX
-        primaryStage.setTitle("Лабка");
+        primaryStage.setTitle("Doka 2 Trade");
         //primaryStage.setResizable(false);
-
-
-        // Добавляем Graphic Context для Creature, чтобы возможно было рисовать без n-ой вложенности и отрисовываем их
-        for (Creature current : world.getCreatures()) {
-            current.setGc(gc);
-        }
-
-        updateCreatures(world, world.getCoordinates().length, world.getCoordinates()[0].length);
-
-        thread = new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                Runnable updater = new Runnable() {
-
-                    @Override
-                    public void run() {
-                        //moveCreatures(world, world.getCoordinates().length, world.getCoordinates()[0].length);
-                        //gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-
-                        //drawCoords(gc, world.getCoordinates().length, world.getCoordinates()[0].length);
-                    }
-                };
-
-                while (true) {
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException ex) {
-                        ex.printStackTrace();
-                    }
-                    Platform.runLater(updater);
-                }
-            }
-
-        });
-
+        updateCreatures(world);
         primaryStage.show();
-
-        thread.setDaemon(true);
-        thread.start();
-
     }
 
-    private void drawCoords(GraphicsContext gc, int width, int height) {
-        gc.setFill(Color.WHITESMOKE);
-        gc.setStroke(Color.WHITE);
-        for (int i = 0; i < width+1; i++) {
-            gc.strokeLine(i*cellSize, 0, i*cellSize, width*cellSize);
-            gc.strokeLine(0, i*cellSize, width * cellSize, i*cellSize);
-        }
-
-    }
-
-
-    private void moveCreatures(World world, int width, int height) {
+    /**
+     *  <p>Рандомно передвигает всех персонажей в данном мире</p>
+     *
+     * @param world мир в котором происходят события
+     */
+    private void randomMoveCreatures(World world) {
+        int width = world.getWidth();
+        int height = world.getHeight();
         for (Creature creature : world.getCreatures()) {
             creature.move(world, (int)Math.round(Math.random() * (width - 1)), (int)Math.round(Math.random() * (height-1)));
         }
     }
 
-    private void updateCreatures(World world, int width, int height) {
+
+    /**
+     * <p>Обновляет положение существ в окне</p>
+     *
+     * @param world
+     */
+    private void updateCreatures(World world) {
         int i = 0;
         for (Creature creature : world.getCreatures()) {
             mainGridPain.getChildren().remove(creature.getLabel());
-            Label curLabel = creature.update(i, creature.getName(), cellSize);
+            Label curLabel = creature.update(i, "[" + creature.getClass().toString().substring(6) + "] " + creature.getName(), cellSize);
             curLabel.setVisible(true);
             mainGridPain.add(curLabel, creature.getX(), creature.getY());
             i++;
@@ -211,7 +168,7 @@ public class Main extends Application {
             isChosen = false;
 
         }
-        updateCreatures(world, world.getCoordinates().length, world.getCoordinates()[0].length);
+        updateCreatures(world);
     }
 
     /**
@@ -235,10 +192,20 @@ public class Main extends Application {
             grid.add(txt, 0, 0, 1, 1);
             grid.add(new Separator(), 0, 1, 5, 1);
 
-            grid.add(new Label("Вывести:"), 0, 2, 1, 1);
-            grid.add(new TextField(), 1, 2, 3, 1);
+            Button sayButton = new Button("Сказать");
+            TextField sayText = new TextField();
+            sayButton.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent event) {
+                    creature.sound(Sounds.NORMAL, sayText.getText());
+                }
+            });
+            grid.add(new Label("Сказать:"), 0, 2, 1, 1);
+            grid.add(sayText, 1, 2, 2, 1);
+            grid.add(sayButton, 3, 2, 1, 1);
 
             grid.add(new Label("Поменять страх"), 0, 3, 1, 1);
+            Button updateFearButton = new Button("Обновить");
             ComboBox<String> cb = new ComboBox<>();
             cb.getItems().addAll(
                     "CALM",
@@ -250,59 +217,88 @@ public class Main extends Application {
             );
 
             cb.setPrefWidth(500);
-            grid.add(cb, 1, 3, 3, 1);
+            grid.add(cb, 1, 3, 2, 1);
+            updateFearButton.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent event) {
+                    if (cb.getValue() != null) {
+                        creature.setFear(Fear.valueOf(cb.getValue()));
+                        System.out.println(creature.getFear());
+                    } else {
+                        // Говорить что тут все плохо???
+                    }
+                }
+            });
+            grid.add(updateFearButton, 3, 3, 1, 1);
 
             grid.add(new Separator(), 0, 4, 5, 1);
             Text txt1 = new Text("Дополнительные действия");
             txt1.setFont(Font.font("Dialog", FontWeight.BOLD, 12));
             grid.add(txt1, 0, 5, 1, 1);
             grid.add(new Separator(), 0, 6, 5, 1);
-            Label humanLabel1 = new Label("Быть человеком к ежику по имени:");
-            TextField humanText1 = new TextField();
-            Button humanButton1 = new Button("Надеть одежду");
-            Button humanButton2 = new Button("Снять одежду");
-
-            Button hedgehogButton1 = new Button("Рассказать шутку из БД");
-            Button hedgehogButton2 = new Button("Поводить носом");
-
-            humanButton1.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent event) {
-                    ((Human) creature).putOnCloth();
-                }
-            }); // На нажатие надевает одежду
-            humanButton2.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent event) {
-                    ((Human) creature).takeOffCloth();
-                }
-            }); // На нажатие снимает одежду
-
-            hedgehogButton1.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent event) {
-                    ((Hedgehog) creature).tellJoke();
-                }
-            }); // на нажатие рассказывает шутку из БД
-            hedgehogButton2.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent event) {
-                    ((Hedgehog) creature).sniff();
-                }
-            }); // на нажатие водит носом
 
             if (creature instanceof  Human) {
+                Label humanLabel1 = new Label("Быть человеком к ежику по имени:");
+                TextField humanText1 = new TextField();
+                Button humanButton1 = new Button("Надеть одежду");
+                Button humanButton2 = new Button("Снять одежду");
+                Button humanButton3 = new Button("Быть человеком");
+
+                humanButton1.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent event) {
+                        ((Human) creature).putOnCloth();
+                    }
+                }); // На нажатие надевает одежду
+                humanButton2.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent event) {
+                        ((Human) creature).takeOffCloth();
+                    }
+                }); // На нажатие снимает одежду
+                humanButton3.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent event) {
+                        for (Creature current : world.getCreatures()) {
+                            if ((current.getName().toUpperCase().trim().equals(humanText1.getText().toUpperCase().trim())) && (current instanceof Hedgehog)) {
+                                System.out.println("До " + current.getFear());
+                                ((Human) creature).beHuman(world, (Hedgehog) current);
+                                System.out.println("После " + current.getFear());
+                            } else {
+                                System.out.println(current.getName());
+                            }
+                        }
+                    }
+                }); // На нажатие вызывает метод beHuman()
+
                 grid.add(humanLabel1, 0, 7, 2, 1);
                 grid.add(humanText1, 2, 7, 3, 1);
+                grid.add(humanButton3, 3, 8, 1, 1);
 
-                grid.add(humanButton1, 0, 8, 2, 1);
-                grid.add(humanButton2, 3, 8, 2, 1);
+                grid.add(humanButton1, 0, 9, 2, 1);
+                grid.add(humanButton2, 2, 9, 2, 1);
             } else if (creature instanceof Troll) {
                 grid.add(new Label("Затроллить человека по имени:"), 0, 7, 2, 1);
                 grid.add(new TextField(), 2, 7, 3, 1);
             } else if (creature instanceof Hedgehog) {
-                grid.add(new Button("Рассказать шутку из БД"), 0, 7, 2, 1);
-                grid.add(new Button("Поводить носом"), 3, 7, 2, 1);
+                Button hedgehogButton1 = new Button("Рассказать шутку из БД");
+                Button hedgehogButton2 = new Button("Поводить носом");
+
+                hedgehogButton1.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent event) {
+                        ((Hedgehog) creature).tellJoke();
+                    }
+                }); // на нажатие рассказывает шутку из БД
+                hedgehogButton2.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent event) {
+                        ((Hedgehog) creature).sniff();
+                    }
+                }); // на нажатие водит носом
+
+                grid.add(hedgehogButton1, 0, 7, 2, 1);
+                grid.add(hedgehogButton2, 3, 7, 2, 1);
             }
 
             Scene gridScene = new Scene(grid, 500, 300);
@@ -324,6 +320,6 @@ public class Main extends Application {
         } else {
             isChosen = false;
         }
-        updateCreatures(world, world.getCoordinates().length, world.getCoordinates()[0].length);
+        updateCreatures(world);
     }
 }

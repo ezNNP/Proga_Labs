@@ -18,17 +18,8 @@ public abstract class Creature implements Creatureable {
     private int x, y;
     private int speed;
     private String name;
-    private GraphicsContext gc;
     private Fear fear;
     private Label label;
-
-    public Creature(String name, int x, int y, int speed, GraphicsContext gc) {
-        this.name = name;
-        this.x = x;
-        this.y = y;
-        this.speed = speed;
-        this.gc = gc;
-    }
 
     public Creature(String name, int x, int y, int speed, Fear fear) {
         this.name = name;
@@ -69,17 +60,14 @@ public abstract class Creature implements Creatureable {
 
     @Override
     public Label update(Integer id, String shortName, int cellSize) {
-        //gc.setFont(new Font(cellSize));
         label = new Label(id.toString());
         Tooltip tooltip = new Tooltip(shortName);
         tooltip.setFont(new Font((double) (cellSize / 2)));
         label.setTooltip(tooltip);
-        //bindTooltip(label, tooltip);
         label.setTextFill(Color.web("#000000"));
         label.setFont(new Font(cellSize));
 
         return label;
-        //gc.fillText(shortName, x * cellSize, (y + 1)*cellSize, cellSize);
     }
 
     public int getX() {
@@ -106,14 +94,6 @@ public abstract class Creature implements Creatureable {
         this.speed = speed;
     }
 
-    public GraphicsContext getGc() {
-        return gc;
-    }
-
-    public void setGc(GraphicsContext gc) {
-        this.gc = gc;
-    }
-
     public String getName() {
         return name;
     }
@@ -134,42 +114,18 @@ public abstract class Creature implements Creatureable {
     public void sound(Sounds type, String message) {
         switch (type) {
             case NORMAL:
-                System.out.println(message);
                 break;
             case SHOUT:
-                System.out.println(message.toUpperCase());
+                message = message.toUpperCase();
                 break;
             case WHISPER:
-                System.out.println("*Шепотом*" + message.toLowerCase() + "...");
+                message = "*шепотом*" + message.toLowerCase() + "...";
                 break;
             case LOUD:
-                System.out.println(firstUpperCase(message) + "!");
+                message = firstUpperCase(message) + "!";
         }
-    }
 
-    private static void bindTooltip(final Node node, final Tooltip tooltip){
-
-
-        node.setOnMouseMoved(new EventHandler<MouseEvent>(){
-            @Override
-            public void handle(MouseEvent event) {
-                tooltip.show(node, event.getScreenX(), event.getScreenY() + 15);
-            }
-        });
-
-        node.setOnMouseEntered(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                tooltip.show(node, event.getScreenX(), event.getScreenY() + 15);
-            }
-        });
-
-        node.setOnMouseExited(new EventHandler<MouseEvent>(){
-            @Override
-            public void handle(MouseEvent event){
-                tooltip.hide();
-            }
-        });
+        System.out.println(this.name + ": " + message);
     }
 
     private String firstUpperCase(String word){
