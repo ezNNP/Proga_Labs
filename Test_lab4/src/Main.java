@@ -59,7 +59,6 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Stage startStage = primaryStage;
         GridPane startGridPane = new GridPane();
         startGridPane.setPadding(new Insets(5));
         startGridPane.setVgap(6);
@@ -109,7 +108,6 @@ public class Main extends Application {
         startGridPane.add(button, 1, 5, 1, 1);
 
         gridStage.show();
-
     }
 
     public void mainScreen(Stage primaryStage, int worldWidth, int worldHeight) {
@@ -276,7 +274,7 @@ public class Main extends Application {
                 public void handle(ActionEvent event) {
                     if (cb.getValue() != null) {
                         creature.setFear(Fear.valueOf(cb.getValue()));
-                        System.out.println(creature.getFear());
+                        System.out.println(creature.getName() + ": " + creature.getFear());
                     } else {
                         // Говорить что тут все плохо???
                     }
@@ -284,11 +282,13 @@ public class Main extends Application {
             });
             grid.add(updateFearButton, 3, 3, 1, 1);
 
-            grid.add(new Separator(), 0, 4, 5, 1);
-            Text txt1 = new Text("Дополнительные действия");
-            txt1.setFont(Font.font("Dialog", FontWeight.BOLD, 12));
-            grid.add(txt1, 0, 5, 1, 1);
-            grid.add(new Separator(), 0, 6, 5, 1);
+            if (!(creature instanceof Troll)) {
+                grid.add(new Separator(), 0, 4, 5, 1);
+                Text txt1 = new Text("Дополнительные действия");
+                txt1.setFont(Font.font("Dialog", FontWeight.BOLD, 12));
+                grid.add(txt1, 0, 5, 1, 1);
+                grid.add(new Separator(), 0, 6, 5, 1);
+            }
 
             if (creature instanceof  Human) {
                 Label humanLabel1 = new Label("Быть человеком к ежику по имени:");
@@ -330,9 +330,6 @@ public class Main extends Application {
 
                 grid.add(humanButton1, 0, 9, 2, 1);
                 grid.add(humanButton2, 2, 9, 2, 1);
-            } else if (creature instanceof Troll) {
-                grid.add(new Label("Затроллить человека по имени:"), 0, 7, 2, 1);
-                grid.add(new TextField(), 2, 7, 3, 1);
             } else if (creature instanceof Hedgehog) {
                 Button hedgehogButton1 = new Button("Рассказать шутку из БД");
                 Button hedgehogButton2 = new Button("Поводить носом");
@@ -351,7 +348,7 @@ public class Main extends Application {
                 }); // на нажатие водит носом
 
                 grid.add(hedgehogButton1, 0, 7, 2, 1);
-                grid.add(hedgehogButton2, 3, 7, 2, 1);
+                grid.add(hedgehogButton2, 2, 7, 2, 1);
             }
 
             Scene gridScene = new Scene(grid, 500, 300);
@@ -372,6 +369,63 @@ public class Main extends Application {
             gridStage.show();
         } else {
             isChosen = false;
+            Stage createStage = new Stage();
+            GridPane createGrid = new GridPane();
+            Scene createScene = new Scene(createGrid, 300, 500);
+            createGrid.setPadding(new Insets(5));
+            createGrid.setVgap(7);
+            createGrid.setHgap(2);
+            createStage.setScene(createScene);
+            createStage.initModality(Modality.WINDOW_MODAL);
+            createStage.initOwner(primaryStage);
+
+            createGrid.add(new Text("Создание персонажа"), 0, 0, 2, 1);
+            createGrid.add(new Separator(), 0, 1, 2, 1);
+
+            createGrid.add(new Text("Выберите класс"), 0, 2, 1, 1);
+            ComboBox<String> classes = new ComboBox<>();
+            classes.getItems().addAll(
+                    "Human",
+                    "Troll",
+                    "Hedgehog"
+            );
+            createGrid.add(classes, 1, 2, 1, 1);
+
+            createGrid.add(new Text("Введите имя:"), 0, 3, 1, 1);
+            TextField nameField = new TextField();
+            createGrid.add(nameField, 1, 3, 1, 1);
+
+            createGrid.add(new Text("Введите X:"), 0, 4, 1, 1);
+            TextField xField = new TextField(String.valueOf(x));
+            createGrid.add(xField, 1, 4, 1, 1);
+
+            createGrid.add(new Text("Введите Y:"), 0, 5, 1, 1);
+            TextField yField = new TextField(String.valueOf(y));
+            createGrid.add(yField, 1, 5, 1, 1);
+
+            Button createButton = new Button("Создать персонажа");
+            createButton.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent event) {
+                    Creature createdCreature = null;
+                    String name = nameField.getText();
+                    int x = Integer.parseInt(xField.getText());
+                    int y = Integer.parseInt(yField.getText());
+                    if (classes.getValue().equals("Human")) {
+                        createdCreature = new Human(name, x, y);
+                    } else if (classes.getValue().equals("Troll")) {
+                        createdCreature = new Troll(name, x, y);
+                    } else {
+                        createdCreature = new Hedgehog(name, x, y);
+                    }
+                    world.addCreature(createdCreature);
+                    updateCreatures(world);
+                    createStage.close();
+                }
+            });
+            createGrid.add(createButton, 1, 6, 1, 1);
+
+            createStage.show();
         }
         updateCreatures(world);
     }

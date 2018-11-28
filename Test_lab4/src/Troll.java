@@ -35,6 +35,12 @@ public class Troll extends Creature {
         }
     }
 
+    public Troll(String name, int x, int y) {
+        super(name, x, y, 3, Fear.CALM);
+        this.name = name;
+        this.charism = 3;
+    }
+
     public Troll(String name, int x, int y, int speed, Fear fear, int charism) {
         super(name, x, y, speed, fear);
         this.name = name;

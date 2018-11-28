@@ -11,6 +11,17 @@ public class Human extends Creature {
 	private int charism;
 	private float headDiametr;
 
+	private class Inner {
+
+	}
+
+	public Human(String name, int x, int y) {
+		super(name, x, y, 3, Fear.CALM);
+		this.cloths = null;
+		this.charism = 2;
+		this.headDiametr = 20.0F;
+	}
+
 	public Human(String name, int age, long tall, ArrayList<Cloth> cloths, int charism, Fear fear, float headDiametr, int x, int y, int speed) {
 		super(name, x, y, speed, fear);
 		this.name = name;

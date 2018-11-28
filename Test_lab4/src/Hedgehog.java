@@ -14,6 +14,18 @@ public class Hedgehog extends Animal {
     private boolean ruffled;
     private boolean dumped;
 
+    public Hedgehog(String name, int x, int y) {
+        super(name, x, y, 1, Fear.CALM);
+        this.name = name;
+        this.age = 1;
+        this.tall = 1;
+        this.height = 1;
+        this.weight = 1;
+        this.ruffled = false;
+        this.dumped = false;
+        connection = new Database_Connector("jdbc:postgresql://localhost/lab3", "grigoriy", "123qweasd").getConnection();
+    }
+
     public Hedgehog(String name, int age, long tall, long height, long weight, Fear fear, int x, int y, int speed) {
         super(name, x, y, speed, fear);
         this.name = name;

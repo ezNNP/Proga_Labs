@@ -11,16 +11,14 @@ public class World {
         this.creatures = new ArrayList<>();
         coordinates = new Creature[width][height];
         for (Creature creature : creatures) {
-            this.creatures.add(creature);
-
             int x = creature.getX();
             int y = creature.getY();
 
             if (coordinates[x][y] != null) {
                 System.out.println("Извините, эт место уже занято");
-                System.exit(666);
             } else {
                 coordinates[x][y] = creature;
+                this.creatures.add(creature);
             }
         }
 		this.setWeather(weather);
@@ -72,6 +70,20 @@ public class World {
 
     public int getHeight() {
 	    return coordinates[0].length;
+    }
+
+    public void addCreature(Creature creature) {
+        int x = creature.getX();
+        int y = creature.getY();
+
+        // TODO: 28.11.18 Добавить проверку на координаты и выбросить checked? исключение
+
+        if (coordinates[x][y] != null) {
+            System.out.println("Извините, эт место уже занято"); // TODO: 28.11.18 Выбросить свое исключение (unchecked)
+        } else {
+            this.creatures.add(creature);
+            coordinates[x][y] = creature;
+        }
     }
 
     @Override
