@@ -25,12 +25,11 @@ import java.util.ArrayList;
 
 public class Main extends Application {
 
-    // TODO: 16.11.18 Cell size and width and height of world with variables
-    // TODO: 16.11.18 Переделать в id при наведении писать имя | @done 24.11.2018-14:00
+    // TODO: 16.11.18 Cell size and width and height of world with variables | @done 28.11.2018 18:13
 
     private int windowWidth;
     private int windowHeight;
-    private final int cellSize = 40;
+    private int cellSize;
     private boolean isChosen = false;
     private World world;
     private Group root;
@@ -60,6 +59,60 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        Stage startStage = primaryStage;
+        GridPane startGridPane = new GridPane();
+        startGridPane.setPadding(new Insets(5));
+        startGridPane.setVgap(6);
+        startGridPane.setHgap(2);
+
+        Scene gridScene = new Scene(startGridPane, 500, 300);
+        Stage gridStage = new Stage();
+
+        // New window (Stage)
+
+        gridStage.setTitle("Выберите опцию из списка доступных");
+        gridStage.setScene(gridScene);
+
+        gridStage.initOwner(primaryStage);
+
+        startGridPane.add(new Text("Укажите размеры"), 0, 0, 1, 1);
+        startGridPane.add(new Separator(), 0, 1, 2, 1);
+
+        startGridPane.add(new Text("Длина: "), 0, 2, 1, 1);
+        TextField widthText = new TextField();
+        startGridPane.add(widthText, 1, 2, 1, 1);
+
+        startGridPane.add(new Text("Высота: "), 0, 3, 1, 1);
+        TextField heightText = new TextField();
+        startGridPane.add(heightText, 1, 3, 1, 1);
+
+        startGridPane.add(new Text("Размер клетки (px): "), 0, 4, 1, 1);
+        TextField cellSizeText = new TextField();
+        startGridPane.add(cellSizeText, 1, 4, 1, 1);
+
+        Button button = new Button("Старт");
+        button.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                try {
+                    int worldWidth = Integer.parseInt(widthText.getText());
+                    int worldHeight = Integer.parseInt(heightText.getText());
+                    cellSize = Integer.parseInt(cellSizeText.getText());
+                    mainScreen(primaryStage, worldWidth, worldHeight);
+                    gridStage.close();
+                } catch (NumberFormatException e) {
+                    Alert alert = new Alert(Alert.AlertType.WARNING, "Вы ввели некорректные данные,\nпопробуйте еще раз", ButtonType.OK);
+                    alert.showAndWait();
+                }
+            }
+        });
+        startGridPane.add(button, 1, 5, 1, 1);
+
+        gridStage.show();
+
+    }
+
+    public void mainScreen(Stage primaryStage, int worldWidth, int worldHeight) {
         this.primaryStage = primaryStage;
         this.mainGridPain = new GridPane();
 
@@ -78,7 +131,7 @@ public class Main extends Application {
         Human human3 = new Human("П", 1, 1, 1, Fear.CALM, 30F, 10, 10, 8);
         Human human4 = new Human("А", 1, 1, 1, Fear.CALM, 30F, 1, 9, 8);
 
-        world = new World(Weather.RAIN, 20, 15, human, troll, hedgehog, human1, human2, human3, human4);
+        world = new World(Weather.RAIN, worldWidth, worldHeight, human, troll, hedgehog, human1, human2, human3, human4);
         for (int i = 0; i < world.getCoordinates()[0].length; i++) {
             RowConstraints row = new RowConstraints(cellSize);
             mainGridPain.getRowConstraints().add(row);
