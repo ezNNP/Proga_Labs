@@ -2,15 +2,11 @@ import exceptions.BusyCellException;
 import exceptions.NullClassException;
 import exceptions.TooLargeMapException;
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
@@ -69,27 +65,24 @@ public class Main extends Application {
         startGridPane.add(cellSizeText, 1, 4, 1, 1);
 
         Button button = new Button("Старт");
-        button.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                try {
-                    int worldWidth = Integer.parseInt(widthText.getText());
-                    int worldHeight = Integer.parseInt(heightText.getText());
-                    cellSize = Integer.parseInt(cellSizeText.getText());
-                    if ((worldWidth * cellSize > 1920) || (worldHeight * cellSize > 1080)) {
-                        throw new TooLargeMapException();
-                    }
-                    mainScreen(primaryStage, worldWidth, worldHeight);
-                    gridStage.close();
-                } catch (NumberFormatException e) {
-                    Alert alert = new Alert(Alert.AlertType.WARNING, "Вы ввели некорректные данные,\nпопробуйте еще раз", ButtonType.OK);
-                    alert.setResizable(false);
-                    alert.showAndWait();
-                } catch (TooLargeMapException e) {
-                    Alert alert = new Alert(Alert.AlertType.WARNING, "Слишком большой размер карты\nПопробуйте уменьшить размер клетки,\nвысоту или длину мира", ButtonType.OK);
-                    alert.setResizable(false);
-                    alert.showAndWait();
+        button.setOnAction(event -> {
+            try {
+                int worldWidth = Integer.parseInt(widthText.getText());
+                int worldHeight = Integer.parseInt(heightText.getText());
+                cellSize = Integer.parseInt(cellSizeText.getText());
+                if ((worldWidth * cellSize > 1920) || (worldHeight * cellSize > 1080)) {
+                    throw new TooLargeMapException();
                 }
+                mainScreen(primaryStage, worldWidth, worldHeight);
+                gridStage.close();
+            } catch (NumberFormatException e) {
+                Alert alert = new Alert(Alert.AlertType.WARNING, "Вы ввели некорректные данные,\nпопробуйте еще раз", ButtonType.OK);
+                alert.setResizable(false);
+                alert.showAndWait();
+            } catch (TooLargeMapException e) {
+                Alert alert = new Alert(Alert.AlertType.WARNING, "Слишком большой размер карты\nПопробуйте уменьшить размер клетки,\nвысоту или длину мира", ButtonType.OK);
+                alert.setResizable(false);
+                alert.showAndWait();
             }
         });
         startGridPane.add(button, 1, 5, 1, 1);
@@ -97,12 +90,12 @@ public class Main extends Application {
         gridStage.show();
     }
 
-    public void mainScreen(Stage primaryStage, int worldWidth, int worldHeight) {
+    private void mainScreen(Stage primaryStage, int worldWidth, int worldHeight) {
         this.primaryStage = primaryStage;
         this.mainGridPain = new GridPane();
 
 
-        ArrayList<Cloth> hats = new ArrayList<>();
+        /*ArrayList<Cloth> hats = new ArrayList<>();
         hats.add(new Hat(false, 32F, 10, HatType.ZYLINDER));
 
         Human human = new Human("Френкен Cнорк", 60, 180, hats, 3, Fear.CALM, 31F, 0, 0, 2);
@@ -110,7 +103,7 @@ public class Main extends Application {
         Troll troll = new Troll("Мумми Тролль", 0, 1, 3, Fear.USUAL, 2);
 
         Hedgehog hedgehog = new Hedgehog("Yojik", 3, 15, 10, 4, Fear.SHOCK, 0, 2, 3); // транслитом потому-что с русскими буквами не работает roflan
-
+*/
         //world = new World(Weather.RAIN, worldWidth, worldHeight, human, troll, hedgehog);
         world = new World(Weather.RAIN, worldWidth, worldHeight);
         for (int i = 0; i < world.getCoordinates()[0].length; i++) {
@@ -131,19 +124,16 @@ public class Main extends Application {
         mainGridPain.setGridLinesVisible(true);
         root.getChildren().addAll(mainGridPain);
 
-        scene.setOnMousePressed(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                // коориданты нажатия мыши
-                int x = (int) (event.getSceneX() / cellSize);
-                int y = (int) (event.getSceneY() / cellSize);
-                if (event.getButton().equals(MouseButton.PRIMARY)) {
-                    mouseLeftClickEventHandler(x, y);
-                    System.out.println("Left mouse button clicked on " + (int) (event.getSceneX() / cellSize) + ":" + (int) (event.getSceneY() / cellSize));
-                } else if (event.getButton().equals(MouseButton.SECONDARY)) {
-                    mouseRightClickEventHandler(x, y);
-                    System.out.println("Right mouse button clicked on " + (int) (event.getSceneX() / cellSize) + ":" + (int) (event.getSceneY() / cellSize));
-                }
+        scene.setOnMousePressed(event -> {
+            // коориданты нажатия мыши
+            int x = (int) (event.getSceneX() / cellSize);
+            int y = (int) (event.getSceneY() / cellSize);
+            if (event.getButton().equals(MouseButton.PRIMARY)) {
+                mouseLeftClickEventHandler(x, y);
+                System.out.println("Left mouse button clicked on " + (int) (event.getSceneX() / cellSize) + ":" + (int) (event.getSceneY() / cellSize));
+            } else if (event.getButton().equals(MouseButton.SECONDARY)) {
+                mouseRightClickEventHandler(x, y);
+                System.out.println("Right mouse button clicked on " + (int) (event.getSceneX() / cellSize) + ":" + (int) (event.getSceneY() / cellSize));
             }
         });
 
@@ -230,12 +220,7 @@ public class Main extends Application {
 
             Button sayButton = new Button("Сказать");
             TextField sayText = new TextField();
-            sayButton.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent event) {
-                    creature.sound(Sounds.NORMAL, sayText.getText());
-                }
-            });
+            sayButton.setOnAction(event -> creature.sound(Sounds.NORMAL, sayText.getText()));
             grid.add(new Label("Сказать:"), 0, 2, 1, 1);
             grid.add(sayText, 1, 2, 2, 1);
             grid.add(sayButton, 3, 2, 1, 1);
@@ -254,17 +239,14 @@ public class Main extends Application {
 
             cb.setPrefWidth(500);
             grid.add(cb, 1, 3, 2, 1);
-            updateFearButton.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent event) {
-                    if (cb.getValue() != null) {
-                        creature.setFear(Fear.valueOf(cb.getValue()));
-                        System.out.println(creature.getName() + ": " + creature.getFear());
-                    } else {
-                        Alert alert = new Alert(Alert.AlertType.WARNING, "Вы не выбрали новый тип страха\nПопробуйте еще раз", ButtonType.OK);
-                        alert.setResizable(false);
-                        alert.showAndWait();
-                    }
+            updateFearButton.setOnAction(event -> {
+                if (cb.getValue() != null) {
+                    creature.setFear(Fear.valueOf(cb.getValue()));
+                    System.out.println(creature.getName() + ": " + creature.getFear());
+                } else {
+                    Alert alert = new Alert(Alert.AlertType.WARNING, "Вы не выбрали новый тип страха\nПопробуйте еще раз", ButtonType.OK);
+                    alert.setResizable(false);
+                    alert.showAndWait();
                 }
             });
             grid.add(updateFearButton, 3, 3, 1, 1);
@@ -284,29 +266,16 @@ public class Main extends Application {
                 Button humanButton2 = new Button("Снять одежду");
                 Button humanButton3 = new Button("Быть человеком");
 
-                humanButton1.setOnAction(new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(ActionEvent event) {
-                        ((Human) creature).putOnCloth();
-                    }
-                }); // На нажатие надевает одежду
-                humanButton2.setOnAction(new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(ActionEvent event) {
-                        ((Human) creature).takeOffCloth();
-                    }
-                }); // На нажатие снимает одежду
-                humanButton3.setOnAction(new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(ActionEvent event) {
-                        for (Creature current : world.getCreatures()) {
-                            if ((current.getName().toUpperCase().trim().equals(humanText1.getText().toUpperCase().trim())) && (current instanceof Hedgehog)) {
-                                System.out.println("До " + current.getFear());
-                                ((Human) creature).beHuman(world, (Hedgehog) current);
-                                System.out.println("После " + current.getFear());
-                            } else {
-                                System.out.println(current.getName());
-                            }
+                humanButton1.setOnAction(event -> ((Human) creature).putOnCloth()); // На нажатие надевает одежду
+                humanButton2.setOnAction(event -> ((Human) creature).takeOffCloth()); // На нажатие снимает одежду
+                humanButton3.setOnAction(event -> {
+                    for (Creature current : world.getCreatures()) {
+                        if ((current.getName().toUpperCase().trim().equals(humanText1.getText().toUpperCase().trim())) && (current instanceof Hedgehog)) {
+                            System.out.println("До " + current.getFear());
+                            ((Human) creature).beHuman(world, (Hedgehog) current);
+                            System.out.println("После " + current.getFear());
+                        } else {
+                            System.out.println(current.getName());
                         }
                     }
                 }); // На нажатие вызывает метод beHuman()
@@ -321,18 +290,8 @@ public class Main extends Application {
                 Button hedgehogButton1 = new Button("Рассказать шутку из БД");
                 Button hedgehogButton2 = new Button("Поводить носом");
 
-                hedgehogButton1.setOnAction(new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(ActionEvent event) {
-                        ((Hedgehog) creature).tellJoke();
-                    }
-                }); // на нажатие рассказывает шутку из БД
-                hedgehogButton2.setOnAction(new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(ActionEvent event) {
-                        ((Hedgehog) creature).sniff();
-                    }
-                }); // на нажатие водит носом
+                hedgehogButton1.setOnAction(event -> ((Hedgehog) creature).tellJoke()); // на нажатие рассказывает шутку из БД
+                hedgehogButton2.setOnAction(event -> ((Hedgehog) creature).sniff()); // на нажатие водит носом
 
                 grid.add(hedgehogButton1, 0, 7, 2, 1);
                 grid.add(hedgehogButton2, 2, 7, 2, 1);
@@ -391,45 +350,46 @@ public class Main extends Application {
             createGrid.add(yField, 1, 5, 1, 1);
 
             Button createButton = new Button("Создать персонажа");
-            createButton.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent event) {
-                    Creature createdCreature = null;
-                    String name = nameField.getText();
-                    try {
-                        int x = Integer.parseInt(xField.getText());
-                        int y = Integer.parseInt(yField.getText());
+            createButton.setOnAction(event -> {
+                Creature createdCreature;
+                String name = nameField.getText();
+                try {
+                    int x1 = Integer.parseInt(xField.getText());
+                    int y1 = Integer.parseInt(yField.getText());
 
-                        if ((x >= world.getWidth()) || (y >= world.getHeight())) {
-                            throw new NumberFormatException();
-                        }
-
-                        if (classes.getValue().equals("Human")) {
-                            createdCreature = new Human(name, x, y);
-                        } else if (classes.getValue().equals("Troll")) {
-                            createdCreature = new Troll(name, x, y);
-                        } else if (classes.getValue().equals("Hedgehog")) {
-                            createdCreature = new Hedgehog(name, x, y);
-                        } else {
-                            throw new NullClassException();
-                        }
-
-                        world.addCreature(createdCreature); // может выбросить BusyCellException
-                        updateCreatures(world);
-                        createStage.close();
-                    } catch (NullClassException e) {
-                        Alert alert = new Alert(Alert.AlertType.WARNING, "Вы не ввели данные при выборе класса\nПопробуйте еще раз", ButtonType.OK);
-                        alert.setResizable(false);
-                        alert.showAndWait();
-                    } catch (NumberFormatException e) {
-                        Alert alert = new Alert(Alert.AlertType.WARNING, "Вы ввели некорректные данные для полей\nx и/или y, попробуйте еще раз", ButtonType.OK);
-                        alert.setResizable(false);
-                        alert.showAndWait();
-                    } catch (BusyCellException e) {
-                        Alert alert = new Alert(Alert.AlertType.WARNING, "Выбранная вами клетка занята\nПопробуйте еще раз", ButtonType.OK);
-                        alert.setResizable(false);
-                        alert.showAndWait();
+                    if ((x1 >= world.getWidth()) || (y1 >= world.getHeight())) {
+                        throw new NumberFormatException();
                     }
+
+                    switch (classes.getValue()) {
+                        case "Human":
+                            createdCreature = new Human(name, x1, y1);
+                            break;
+                        case "Troll":
+                            createdCreature = new Troll(name, x1, y1, new Troll.Dybina(10));
+                            break;
+                        case "Hedgehog":
+                            createdCreature = new Hedgehog(name, x1, y1);
+                            break;
+                        default:
+                            throw new NullClassException();
+                    }
+
+                    world.addCreature(createdCreature); // может выбросить BusyCellException
+                    updateCreatures(world);
+                    createStage.close();
+                } catch (NullClassException e) {
+                    Alert alert = new Alert(Alert.AlertType.WARNING, "Вы не ввели данные при выборе класса\nПопробуйте еще раз", ButtonType.OK);
+                    alert.setResizable(false);
+                    alert.showAndWait();
+                } catch (NumberFormatException e) {
+                    Alert alert = new Alert(Alert.AlertType.WARNING, "Вы ввели некорректные данные для полей\nx и/или y, попробуйте еще раз", ButtonType.OK);
+                    alert.setResizable(false);
+                    alert.showAndWait();
+                } catch (BusyCellException e) {
+                    Alert alert = new Alert(Alert.AlertType.WARNING, "Выбранная вами клетка занята\nПопробуйте еще раз", ButtonType.OK);
+                    alert.setResizable(false);
+                    alert.showAndWait();
                 }
             });
             createGrid.add(createButton, 1, 6, 1, 1);

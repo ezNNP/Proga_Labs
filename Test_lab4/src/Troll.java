@@ -1,11 +1,38 @@
-import javafx.scene.canvas.GraphicsContext;
-
 public class Troll extends Creature {
 
-    private int charism;
+    public static class Dybina {
+        private int size;
+        private Troll owner;
 
-    public Troll(String name, int x, int y) {
+        public Dybina(int size, Troll owner) {
+            this.size = size;
+            this.owner = owner;
+        }
+
+        public Dybina(int size) {
+            this.size = size;
+        }
+
+        public int getSize() {
+            return size;
+        }
+
+        public Troll getOwner() {
+            return owner;
+        }
+
+        public void setOwner(Troll owner) {
+            this.owner = owner;
+        }
+    }
+
+    private int charism;
+    private Dybina dybina;
+
+    public Troll(String name, int x, int y, Dybina dybina) {
         super(name, x, y, 3, Fear.CALM);
+        this.dybina = dybina;
+        this.dybina.setOwner(this);
         this.charism = 3;
     }
 
@@ -20,5 +47,9 @@ public class Troll extends Creature {
 
     public void setCharism(int charism) {
         this.charism = charism;
+    }
+
+    public Dybina getDybina() {
+        return dybina;
     }
 }
