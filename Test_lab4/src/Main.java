@@ -33,7 +33,12 @@ public class Main extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
+        class MyButton extends Button {
+            MyButton(String text) {
+                super(text);
+            }
+        }
         GridPane startGridPane = new GridPane();
         startGridPane.setPadding(new Insets(5));
         startGridPane.setVgap(6);
@@ -64,7 +69,7 @@ public class Main extends Application {
         TextField cellSizeText = new TextField();
         startGridPane.add(cellSizeText, 1, 4, 1, 1);
 
-        Button button = new Button("Старт");
+        Button button = new MyButton("Старт");
         button.setOnAction(event -> {
             try {
                 int worldWidth = Integer.parseInt(widthText.getText());
@@ -105,7 +110,7 @@ public class Main extends Application {
         Hedgehog hedgehog = new Hedgehog("Yojik", 3, 15, 10, 4, Fear.SHOCK, 0, 2, 3); // транслитом потому-что с русскими буквами не работает roflan
 */
         //world = new World(Weather.RAIN, worldWidth, worldHeight, human, troll, hedgehog);
-        world = new World(Weather.RAIN, worldWidth, worldHeight);
+        world = new World(Weather.RAIN, worldWidth, worldHeight, new Human("EasyAnonymousClass", 0, 0));
         for (int i = 0; i < world.getCoordinates()[0].length; i++) {
             RowConstraints row = new RowConstraints(cellSize);
             mainGridPain.getRowConstraints().add(row);
