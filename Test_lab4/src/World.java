@@ -24,6 +24,12 @@ public class World {
 		this.setWeather(weather);
 	}
 
+    public World(Weather weather, int width, int height) {
+	    this.creatures = new ArrayList<>();
+        coordinates = new Creature[width][height];
+        this.setWeather(weather);
+    }
+
     public ArrayList<Creature> getCreatures() {
 		return creatures;
 	}
@@ -39,20 +45,22 @@ public class World {
 	public void setWeather(Weather weather) {
 		this.weather = weather;
 		int ord = weather.ordinal();
-		for (Creature creature : creatures) {
-			if ((creature instanceof Hedgehog)) {
-				if (ord < 4) {
-                    ((Hedgehog) creature).setDumped(false);
-                    ((Hedgehog) creature).setRuffled(false);
-                    if (ord == 3) {
+		if (creatures != null) {
+            for (Creature creature : creatures) {
+                if ((creature instanceof Hedgehog)) {
+                    if (ord < 4) {
+                        ((Hedgehog) creature).setDumped(false);
+                        ((Hedgehog) creature).setRuffled(false);
+                        if (ord == 3) {
+                            ((Hedgehog) creature).setRuffled(true);
+                        }
+                    } else {
+                        ((Hedgehog) creature).setDumped(true);
                         ((Hedgehog) creature).setRuffled(true);
                     }
-				} else {
-                    ((Hedgehog) creature).setDumped(true);
-                    ((Hedgehog) creature).setRuffled(true);
                 }
-			}
-		}
+            }
+        }
 	}
 
 
@@ -113,5 +121,9 @@ public class World {
                 ", creatures=" + creatures +
                 ", weather=" + weather +
                 '}';
+    }
+
+    class WorldCreator {
+
     }
 }

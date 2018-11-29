@@ -1,19 +1,18 @@
+import exceptions.NullClassException;
+import exceptions.TooLargeMapException;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
-import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -21,37 +20,19 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import java.util.ArrayList;
-
 public class Main extends Application {
 
     // TODO: 16.11.18 Cell size and width and height of world with variables | @done 28.11.2018 18:13
 
-    private int windowWidth;
-    private int windowHeight;
     private int cellSize;
     private boolean isChosen = false;
     private World world;
     private Group root;
     private Scene scene;
     private Canvas canvas;
-    private GraphicsContext gc;
-    private Thread thread;
     private Creature choosed;
     private Stage primaryStage;
     private GridPane mainGridPain;
-
-    private static Integer parse(String x) {
-        return Integer.parseInt(x);
-    }
-
-    private static int p() {
-        return p();
-    }
-
-    private static RuntimeException ex() {
-        return new RuntimeException();
-    }
 
     public static void main(String[] args) {
         launch(args);
@@ -97,10 +78,18 @@ public class Main extends Application {
                     int worldWidth = Integer.parseInt(widthText.getText());
                     int worldHeight = Integer.parseInt(heightText.getText());
                     cellSize = Integer.parseInt(cellSizeText.getText());
+                    if ((worldWidth * cellSize > 1920) || (worldHeight * cellSize > 1080)) {
+                        throw new TooLargeMapException();
+                    }
                     mainScreen(primaryStage, worldWidth, worldHeight);
                     gridStage.close();
                 } catch (NumberFormatException e) {
                     Alert alert = new Alert(Alert.AlertType.WARNING, "Вы ввели некорректные данные,\nпопробуйте еще раз", ButtonType.OK);
+                    alert.setResizable(false);
+                    alert.showAndWait();
+                } catch (TooLargeMapException e) {
+                    Alert alert = new Alert(Alert.AlertType.WARNING, "Слишком большой размер карты\nПопробуйте уменьшить размер клетки,\nвысоту или длину мира", ButtonType.OK);
+                    alert.setResizable(false);
                     alert.showAndWait();
                 }
             }
@@ -115,7 +104,7 @@ public class Main extends Application {
         this.mainGridPain = new GridPane();
 
 
-        ArrayList<Cloth> hats = new ArrayList<>();
+        /*ArrayList<Cloth> hats = new ArrayList<>();
         hats.add(new Hat(false, 32F, 10, HatType.ZYLINDER));
 
         Human human = new Human("Френкен Cнорк", 60, 180, hats, 3, Fear.CALM, 31F, 0, 0, 2);
@@ -127,9 +116,10 @@ public class Main extends Application {
         Human human1 = new Human("Ж", 1, 1, 5, Fear.CALM, 50F, 6, 6, 10);
         Human human2 = new Human("О", 1, 1, 1, Fear.CALM, 30F, 7, 7, 8);
         Human human3 = new Human("П", 1, 1, 1, Fear.CALM, 30F, 10, 10, 8);
-        Human human4 = new Human("А", 1, 1, 1, Fear.CALM, 30F, 1, 9, 8);
+        Human human4 = new Human("А", 1, 1, 1, Fear.CALM, 30F, 1, 9, 8);*/
 
-        world = new World(Weather.RAIN, worldWidth, worldHeight, human, troll, hedgehog, human1, human2, human3, human4);
+        //world = new World(Weather.RAIN, worldWidth, worldHeight, human, troll, hedgehog, human1, human2, human3, human4);
+        world = new World(Weather.RAIN, worldWidth, worldHeight);
         for (int i = 0; i < world.getCoordinates()[0].length; i++) {
             RowConstraints row = new RowConstraints(cellSize);
             mainGridPain.getRowConstraints().add(row);
@@ -141,8 +131,8 @@ public class Main extends Application {
         }
 
         root = new Group();
-        scene = new Scene(root, world.getCoordinates().length * cellSize, world.getCoordinates()[0].length * cellSize, Paint.valueOf("#FFFFFF"));
-        canvas = new Canvas(world.getCoordinates().length * cellSize, world.getCoordinates()[0].length * cellSize);
+        scene = new Scene(root, world.getWidth() * cellSize, world.getHeight()* cellSize, Paint.valueOf("#FFFFFF"));
+        canvas = new Canvas(world.getWidth() * cellSize, world.getHeight() * cellSize);
 
         primaryStage.setScene(scene);
         mainGridPain.setVisible(true);
@@ -167,7 +157,9 @@ public class Main extends Application {
 
         primaryStage.setTitle("Doka 2 Trade");
         //primaryStage.setResizable(false);
-        updateCreatures(world);
+        if (world.getCreatures() != null) {
+            updateCreatures(world);
+        }
         primaryStage.show();
     }
 
@@ -188,7 +180,7 @@ public class Main extends Application {
     /**
      * <p>Обновляет положение существ в окне</p>
      *
-     * @param world
+     * @param world мир в котором происходят события
      */
     private void updateCreatures(World world) {
         int i = 0;
@@ -409,18 +401,35 @@ public class Main extends Application {
                 public void handle(ActionEvent event) {
                     Creature createdCreature = null;
                     String name = nameField.getText();
-                    int x = Integer.parseInt(xField.getText());
-                    int y = Integer.parseInt(yField.getText());
-                    if (classes.getValue().equals("Human")) {
-                        createdCreature = new Human(name, x, y);
-                    } else if (classes.getValue().equals("Troll")) {
-                        createdCreature = new Troll(name, x, y);
-                    } else {
-                        createdCreature = new Hedgehog(name, x, y);
+                    try {
+                        int x = Integer.parseInt(xField.getText());
+                        int y = Integer.parseInt(yField.getText());
+
+                        if ((x >= world.getWidth()) || (y >= world.getHeight())) {
+                            throw new NumberFormatException();
+                        }
+
+                        if (classes.getValue().equals("Human")) {
+                            createdCreature = new Human(name, x, y);
+                        } else if (classes.getValue().equals("Troll")) {
+                            createdCreature = new Troll(name, x, y);
+                        } else if (classes.getValue().equals("Hedgehog")) {
+                            createdCreature = new Hedgehog(name, x, y);
+                        } else {
+                            throw new NullClassException();
+                        }
+                        world.addCreature(createdCreature);
+                        updateCreatures(world);
+                        createStage.close();
+                    } catch (NullClassException e) {
+                        Alert alert = new Alert(Alert.AlertType.WARNING, "Вы не ввели данные при выборе класса\nПопробуйте еще раз", ButtonType.OK);
+                        alert.setResizable(false);
+                        alert.showAndWait();
+                    } catch (NumberFormatException e) {
+                        Alert alert = new Alert(Alert.AlertType.WARNING, "Вы ввели некорректные данные для полей\nx и/или y, попробуйте еще раз", ButtonType.OK);
+                        alert.setResizable(false);
+                        alert.showAndWait();
                     }
-                    world.addCreature(createdCreature);
-                    updateCreatures(world);
-                    createStage.close();
                 }
             });
             createGrid.add(createButton, 1, 6, 1, 1);
