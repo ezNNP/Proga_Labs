@@ -1,3 +1,4 @@
+import exceptions.BusyCellException;
 import exceptions.NullClassException;
 import exceptions.TooLargeMapException;
 import javafx.application.Application;
@@ -20,16 +21,13 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-public class Main extends Application {
+import java.util.ArrayList;
 
-    // TODO: 16.11.18 Cell size and width and height of world with variables | @done 28.11.2018 18:13
+public class Main extends Application {
 
     private int cellSize;
     private boolean isChosen = false;
     private World world;
-    private Group root;
-    private Scene scene;
-    private Canvas canvas;
     private Creature choosed;
     private Stage primaryStage;
     private GridPane mainGridPain;
@@ -130,9 +128,8 @@ public class Main extends Application {
             mainGridPain.getColumnConstraints().add(column);
         }
 
-        root = new Group();
-        scene = new Scene(root, world.getWidth() * cellSize, world.getHeight()* cellSize, Paint.valueOf("#FFFFFF"));
-        canvas = new Canvas(world.getWidth() * cellSize, world.getHeight() * cellSize);
+        Group root = new Group();
+        Scene scene = new Scene(root, world.getWidth() * cellSize, world.getHeight() * cellSize, Paint.valueOf("#FFFFFF"));
 
         primaryStage.setScene(scene);
         mainGridPain.setVisible(true);
@@ -156,7 +153,7 @@ public class Main extends Application {
         });
 
         primaryStage.setTitle("Doka 2 Trade");
-        //primaryStage.setResizable(false);
+        primaryStage.setResizable(false);
         if (world.getCreatures() != null) {
             updateCreatures(world);
         }
@@ -268,7 +265,9 @@ public class Main extends Application {
                         creature.setFear(Fear.valueOf(cb.getValue()));
                         System.out.println(creature.getName() + ": " + creature.getFear());
                     } else {
-                        // Говорить что тут все плохо???
+                        Alert alert = new Alert(Alert.AlertType.WARNING, "Вы не выбрали новый тип страха\nПопробуйте еще раз", ButtonType.OK);
+                        alert.setResizable(false);
+                        alert.showAndWait();
                     }
                 }
             });
@@ -418,7 +417,8 @@ public class Main extends Application {
                         } else {
                             throw new NullClassException();
                         }
-                        world.addCreature(createdCreature);
+
+                        world.addCreature(createdCreature); // может выбросить BusyCellException
                         updateCreatures(world);
                         createStage.close();
                     } catch (NullClassException e) {
@@ -427,6 +427,10 @@ public class Main extends Application {
                         alert.showAndWait();
                     } catch (NumberFormatException e) {
                         Alert alert = new Alert(Alert.AlertType.WARNING, "Вы ввели некорректные данные для полей\nx и/или y, попробуйте еще раз", ButtonType.OK);
+                        alert.setResizable(false);
+                        alert.showAndWait();
+                    } catch (BusyCellException e) {
+                        Alert alert = new Alert(Alert.AlertType.WARNING, "Выбранная вами клетка занята\nПопробуйте еще раз", ButtonType.OK);
                         alert.setResizable(false);
                         alert.showAndWait();
                     }

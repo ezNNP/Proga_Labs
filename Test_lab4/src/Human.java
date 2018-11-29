@@ -15,6 +15,10 @@ public class Human extends Creature {
 
 	}
 
+	private static class StaticInner {
+
+	}
+
 	public Human(String name, int x, int y) {
 		super(name, x, y, 3, Fear.CALM);
 		this.cloths = null;
@@ -61,16 +65,12 @@ public class Human extends Creature {
                 ordinal += world.getWeather().ordinal();
 				System.out.println("Из-за погоды страх изменился на -" + world.getWeather().ordinal());
             } else {
-                ordinal -= world.getWeather().ordinal();
+                ordinal -= world.getWeather().ordinal() + 3;
 				System.out.println("Из-за погоды страх изменился на " + world.getWeather().ordinal());
             }
 
 			System.out.println("Из-за харизмы страх изменился на " + charism);
-            if (ordinal > charism) {
-                ordinal -= charism;
-            } else {
-                ordinal = 0;
-            }
+            ordinal -= charism;
 
             if (ordinal < 0) {
                 ordinal = 0;

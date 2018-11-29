@@ -1,3 +1,5 @@
+import exceptions.BusyCellException;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -80,14 +82,14 @@ public class World {
 	    return coordinates[0].length;
     }
 
-    public void addCreature(Creature creature) {
+    public void addCreature(Creature creature) throws BusyCellException {
         int x = creature.getX();
         int y = creature.getY();
 
         // TODO: 28.11.18 Добавить проверку на координаты и выбросить checked? исключение
 
         if (coordinates[x][y] != null) {
-            System.out.println("Извините, эт место уже занято"); // TODO: 28.11.18 Выбросить свое исключение (unchecked)
+            throw new BusyCellException();
         } else {
             this.creatures.add(creature);
             coordinates[x][y] = creature;
