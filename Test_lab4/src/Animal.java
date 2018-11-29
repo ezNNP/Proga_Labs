@@ -6,8 +6,6 @@ public abstract class Animal extends Creature {
         super(name, x, y, speed, fear);
     }
 
-    public abstract void move(World world, int x, int y);
-
     @Override
     public Label update(Integer id, String shortName, int cellSize) {
         return super.update(id, shortName, cellSize);

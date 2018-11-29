@@ -39,32 +39,6 @@ public class Hedgehog extends Animal {
     }
 
     @Override
-    public void move(World world, int x, int y) {
-        int localSpeed = super.getSpeed() + super.getFear().ordinal();
-        double time = 0D;
-        if (localSpeed != 0) {
-            if (world.getCoordinates()[x][y] == null) {
-                world.getCoordinates()[super.getX()][super.getY()] = null;
-                time = Math.hypot(Math.abs(super.getX() - x), Math.abs(super.getY() - y)) / localSpeed;
-                System.out.println("Подождите " + Math.round(time) + " секунд");
-                try {
-                    Thread.sleep(Math.round(time) * 100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                world.getCoordinates()[x][y] = this;
-                super.setX(x);
-                super.setY(y);
-                System.out.println(this.name + " передвинулся на координаты " + x + ":" + y + " за " + Math.round(time) + " секунд.");
-            } else {
-                System.out.println("Невозможно передвинуться на " + x + ":" + y + ", так как там кто-то стоит");
-            }
-        } else {
-            System.out.println("Невозможно передвинуться, так как скорость равна 0");
-        }
-    }
-
-    @Override
     public void sniff() {
         System.out.println("Ежик по имени " + this.name + " водить носом *sniff-sniff-sniff*");
     }

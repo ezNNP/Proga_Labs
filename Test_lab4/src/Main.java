@@ -102,7 +102,7 @@ public class Main extends Application {
         this.mainGridPain = new GridPane();
 
 
-        /*ArrayList<Cloth> hats = new ArrayList<>();
+        ArrayList<Cloth> hats = new ArrayList<>();
         hats.add(new Hat(false, 32F, 10, HatType.ZYLINDER));
 
         Human human = new Human("Френкен Cнорк", 60, 180, hats, 3, Fear.CALM, 31F, 0, 0, 2);
@@ -111,12 +111,7 @@ public class Main extends Application {
 
         Hedgehog hedgehog = new Hedgehog("Yojik", 3, 15, 10, 4, Fear.SHOCK, 0, 2, 3); // транслитом потому-что с русскими буквами не работает roflan
 
-        Human human1 = new Human("Ж", 1, 1, 5, Fear.CALM, 50F, 6, 6, 10);
-        Human human2 = new Human("О", 1, 1, 1, Fear.CALM, 30F, 7, 7, 8);
-        Human human3 = new Human("П", 1, 1, 1, Fear.CALM, 30F, 10, 10, 8);
-        Human human4 = new Human("А", 1, 1, 1, Fear.CALM, 30F, 1, 9, 8);*/
-
-        //world = new World(Weather.RAIN, worldWidth, worldHeight, human, troll, hedgehog, human1, human2, human3, human4);
+        //world = new World(Weather.RAIN, worldWidth, worldHeight, human, troll, hedgehog);
         world = new World(Weather.RAIN, worldWidth, worldHeight);
         for (int i = 0; i < world.getCoordinates()[0].length; i++) {
             RowConstraints row = new RowConstraints(cellSize);
@@ -199,9 +194,9 @@ public class Main extends Application {
      */
     private void mouseLeftClickEventHandler(int x, int y) {
         if (!isChosen) {
-            if (world.getCoordinates()[x][y] != null) {
+            if (world.getCell(x, y).getCreature() != null) {
                 isChosen = true;
-                choosed = world.getCoordinates()[x][y];
+                choosed = world.getCoordinates()[x][y].getCreature();
             }
         } else {
             choosed.move(world, x, y);
@@ -218,7 +213,8 @@ public class Main extends Application {
      * @param y координата y мыши
      */
     private void mouseRightClickEventHandler(int x, int y) {
-        Creature creature = world.getCoordinates()[x][y];
+        World.Cell cell = world.getCell(x, y);
+        Creature creature = cell.getCreature();
 
         if (creature != null) {
 

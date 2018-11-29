@@ -36,8 +36,8 @@ public abstract class Creature implements Creatureable {
 
         if ((localSpeed != 0) && (world.getCoordinates().length >= x) && (world.getCoordinates()[0].length >= y)
             && (x >= 0) && (y >= 0)) {
-            if (world.getCoordinates()[x][y] == null) {
-                world.getCoordinates()[getX()][getY()] = null;
+            if (world.getCell(x, y).getCreature() == null) {
+                world.setCell(this.x, this.y);
                 time = Math.hypot(Math.abs(getX() - x), Math.abs(getY() - y)) / localSpeed;
                 System.out.println("Подождите " + Math.round(time) + " секунд");
                 try {
@@ -45,9 +45,9 @@ public abstract class Creature implements Creatureable {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                world.getCoordinates()[x][y] = this;
-                setX(x);
-                setY(y);
+                world.setCell(x, y, this);
+                this.x = x;
+                this.y = y;
                 System.out.println(this.name + " передвинулся на координаты " + x + ":" + y + " за " + Math.round(time) + " секунд.");
             } else {
                 System.out.println("Невозможно передвинуться на " + x + ":" + y + ", так как там кто-то стоит");

@@ -5,21 +5,59 @@ import java.util.Arrays;
 
 public class World {
 
-	private Creature[][] coordinates;
+	private Cell[][] coordinates;
 	private ArrayList<Creature> creatures;
 	private Weather weather;
 
+    public class Cell {
+        private int x, y;
+        private Creature creature;
+
+        public Cell(int x, int y, Creature creature) {
+            this.x = x;
+            this.y = y;
+            this.creature = creature;
+        }
+
+        public Cell(int x, int y) {
+            this.x = x;
+            this.y = y;
+            this.creature = null;
+        }
+
+        public int getX() {
+            return x;
+        }
+
+        public int getY() {
+            return y;
+        }
+
+        public Creature getCreature() {
+            return creature;
+        }
+
+        public void setCreature(Creature creature) {
+            this.creature = creature;
+        }
+    }
+
 	public World(Weather weather, int width, int height, Creature... creatures) {
         this.creatures = new ArrayList<>();
-        coordinates = new Creature[width][height];
+        coordinates = new Cell[width][height];
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                coordinates[i][j] = new Cell(i, j);
+            }
+        }
         for (Creature creature : creatures) {
             int x = creature.getX();
             int y = creature.getY();
 
-            if (coordinates[x][y] != null) {
+            if (getCell(x, y).getCreature() != null) {
                 System.out.println("Извините, эт место уже занято");
             } else {
-                coordinates[x][y] = creature;
+                coordinates[x][y].setCreature(creature);
                 this.creatures.add(creature);
             }
         }
@@ -28,7 +66,12 @@ public class World {
 
     public World(Weather weather, int width, int height) {
 	    this.creatures = new ArrayList<>();
-        coordinates = new Creature[width][height];
+        coordinates = new Cell[width][height];
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                coordinates[i][j] = new Cell(i, j);
+            }
+        }
         this.setWeather(weather);
     }
 
@@ -65,12 +108,32 @@ public class World {
         }
 	}
 
+	public Cell getCell(int x, int y) {
+        return coordinates[x][y];
+    }
 
-    public Creature[][] getCoordinates() {
+    public void setCell(int x, int y, Creature creature) {
+        coordinates[x][y] = new Cell(x, y, creature);
+    }
+
+    public void setCell(int x, int y) {
+        coordinates[x][y] = new Cell(x, y, null);
+    }
+
+
+    public Cell[][] getCoordinates() {
         return coordinates;
     }
 
-    public void setCoordinates(Creature[][] coordinates) {
+    public Creature getCreatureFromCell(int x, int y) {
+        if (coordinates[x][y].getCreature() == null) {
+            return null;
+        } else {
+            return coordinates[x][y].getCreature();
+        }
+    }
+
+    public void setCoordinates(Cell[][] coordinates) {
         this.coordinates = coordinates;
     }
 
@@ -88,11 +151,11 @@ public class World {
 
         // TODO: 28.11.18 Добавить проверку на координаты и выбросить checked? исключение
 
-        if (coordinates[x][y] != null) {
+        if (getCell(x, y).getCreature() != null) {
             throw new BusyCellException();
         } else {
             this.creatures.add(creature);
-            coordinates[x][y] = creature;
+            coordinates[x][y].setCreature(creature);
         }
     }
 
